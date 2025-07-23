@@ -1,0 +1,41 @@
+let
+    // Джерело
+    Source = Excel.CurrentWorkbook(){[Name="Final"]}[Content],
+
+    // Типізація Month як текст, Day як число
+    Typed = Table.TransformColumnTypes(Source, {{"Month", type text}, {"Day", Int64.Type}}),
+
+    // Розгортання всіх колонок, крім Month + Day
+    Unpivoted = Table.UnpivotOtherColumns(Typed, {"Month", "Day"}, "RoomName", "RawCode"),
+
+    // Дата у форматі дд.мм.2025
+    AddDate = Table.AddColumn(Unpivoted, "Date", each 
+        let
+            m = [Month],
+            d = [Day],
+            mNum = 
+                if m = "April" then 4
+                else if m = "May" then 5
+                else if m = "June" then 6
+                else if m = "July" then 7
+                else if m = "August" then 8
+                else if m = "September" then 9
+                else if m = "October" then 10
+                else null
+        in if mNum <> null then 
+            Text.PadStart(Text.From(d),2,"0") & "." & Text.PadStart(Text.From(mNum),2,"0") & ".2025"
+            else null, type text),
+
+    // Канал бронювання
+    AddChannel = Table.AddColumn(AddDate, "Channel", each 
+        if Text.StartsWith(Text.Upper(Text.Trim([RawCode])), "B") then "Booking"
+        else if Text.StartsWith(Text.Upper(Text.Trim([RawCode])), "G") then "Direct"
+        else null),
+
+    // Очистити пусті комірки
+    Cleaned = Table.SelectRows(AddChannel, each Text.Trim([RawCode]) <> "" and [RawCode] <> null),
+
+    // Переставляємо колонки
+    Final = Table.SelectColumns(Cleaned, {"Date", "Month", "Day", "RoomName", "RawCode", "Channel"})
+in
+    Final
