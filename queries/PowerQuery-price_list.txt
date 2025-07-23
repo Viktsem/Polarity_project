@@ -1,0 +1,36 @@
+let
+    // Імпорт вихідної таблиці з Excel, що містить тарифні періоди та ставки для кожного типу номерів
+    Source = Excel.CurrentWorkbook(){[Name="POLARIS"]}[Content],
+
+    // Приведення назв стовпців до узгоджених імен (назви кімнат)
+    RenamedColumns = Table.RenameColumns(Source, {
+        {"Column1", "Period"},
+        {"Column2", "DBL SEA/STREET SIDE"},
+        {"Column3", "DBL MOUNTAIN/COURTYARD SIDE"},
+        {"Column4", "TRPL SEA/STREET SIDE"},
+        {"Column5", "TRPL MOUNTAIN/COURTYARD SIDE"},
+        {"Column6", "FAMILY TWO BEDROOMS WITH BALCONY"},
+        {"Column7", "FAMILY TWO BEDROOMS WITH TERRACE SEA VIEW"},
+        {"Column8", "JUNIOR SUITE WITH TERRACE SEA VIEW"}
+    }),
+
+    // Додавання атрибуту "Channel": визначення тарифного каналу на основі заголовка або вмісту періоду
+    AddChannelFlag = Table.AddColumn(RenamedColumns, "Channel", each if Text.Contains([Period], "booking.com") then "Booking.com" else "Direct"),
+
+    // Вилучення службових рядків ("booking.com") — залишаємо лише фактичні періоди з тарифами
+    CleanRows = Table.SelectRows(AddChannelFlag, each not Text.Contains([Period], "booking.com") and [Period] <> null),
+
+    // Розділення діапазонів періодів на початкову і кінцеву дату; формати мають бути приведені до типу date
+    SplitPeriod = Table.SplitColumn(CleanRows, "Period", Splitter.SplitTextByDelimiter(" - ", QuoteStyle.Csv), {"StartDate", "EndDate"}),
+    ParsedDates = Table.TransformColumnTypes(SplitPeriod, {{"StartDate", type date}, {"EndDate", type date}}),
+
+    // Нормалізація таблиці через unpivot: кожен тип кімнати переноситься в окремий рядок з відповідною ставкою
+    Unpivoted = Table.UnpivotOtherColumns(ParsedDates, {"StartDate", "EndDate", "Channel"}, "RoomName", "Rate"),
+
+    // Додавання фіксованого атрибуту типу закладу, оскільки всі дані стосуються готелю
+    AddType = Table.AddColumn(Unpivoted, "Type", each "Hotel"),
+
+    // Формування фінальної таблиці з узгодженим набором колонок
+    Final = Table.SelectColumns(AddType, {"StartDate", "EndDate", "RoomName", "Channel", "Rate", "Type"})
+in
+    Final
