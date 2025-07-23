@@ -53,7 +53,7 @@ The final report includes five analytical blocks:
 - report.xlsx — full dataset and dashboard (in Ukrainian)
 - report.pdf — final analytical summary (in Ukrainian)
 - queries/ — Power Query scripts and SQL join logic
-- screenshots/ — optional visuals (if added)
+- screenshots/ — optional visuals
 
 ## ⚠️ Usage Notice
 
