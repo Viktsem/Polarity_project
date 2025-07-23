@@ -44,6 +44,7 @@ The final report includes five analytical blocks:
 - 🛎 Direct and Booking.com channels showed similar revenue efficiency
 - 🧩 Some room types (e.g. Studio, Two Bedrooms) were overbooked but underpriced
 - 💡 room named "Soba 3 & 4" delivered high revenue per booking despite moderate volume
+<img width="698" height="487" alt="Report-Block_3" src="https://github.com/user-attachments/assets/e99ff937-e7bb-4db1-8420-2a03d41d89ac" />
 - ⚠️ Several pricing anomalies were identified, suggesting opportunities for rate optimization
 
 ## 📁 Files Included
