@@ -16,7 +16,7 @@ Each booking sheet had:
 - Booking channels (B for Booking.com, D for Direct) as cell values
 
 Using Power Query, this structure was normalized into a long-format table with fields such as:
-- date, month, room_name, channel, room_type, accommodation, rate, revenue
+- date, month, room_name(AP1,AP3...), channel(booking or direct), room_type(mountain view, sea view), accommodation(hotel, villa, apartments), rate, revenue
 
 Pricing data was joined via SQL in DBeaver, matching bookings to dynamic pricing periods (e.g. 1–15, 16–30 of each month).
 
@@ -43,7 +43,7 @@ The final report includes five analytical blocks:
 - 📈 Booking peaked in July, confirming strong seasonality
 - 🛎 Direct and Booking.com channels showed similar revenue efficiency
 - 🧩 Some room types (e.g. Studio, Two Bedrooms) were overbooked but underpriced
-- 💡 Soba 3 & 4 delivered high revenue per booking despite moderate volume
+- 💡 room named "Soba 3 & 4" delivered high revenue per booking despite moderate volume
 - ⚠️ Several pricing anomalies were identified, suggesting opportunities for rate optimization
 
 ## 📁 Files Included
